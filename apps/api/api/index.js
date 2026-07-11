@@ -10,6 +10,8 @@ module.exports = async (req, res) => {
       const { AppModule } = require('../dist/app.module');
 
       const nestApp = express();
+      nestApp.use(express.json());
+      nestApp.use(express.urlencoded({ extended: true }));
       const nest = await NestFactory.create(AppModule, new ExpressAdapter(nestApp), { logger: false });
       nest.setGlobalPrefix('api/v1');
       nest.enableCors();
