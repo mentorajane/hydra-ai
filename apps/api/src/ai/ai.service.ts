@@ -5,12 +5,19 @@ import Groq from 'groq-sdk';
 
 @Injectable()
 export class AiService {
-  private groq: Groq;
+  private groq!: Groq;
+  private groqInitialized = false;
 
-  constructor(private configService: ConfigService) {
-    this.groq = new Groq({
-      apiKey: this.configService.get<string>('GROQ_API_KEY'),
-    });
+  constructor(private configService: ConfigService) {}
+
+  private getGroq(): Groq {
+    if (!this.groqInitialized) {
+      this.groq = new Groq({
+        apiKey: this.configService.get<string>('GROQ_API_KEY'),
+      });
+      this.groqInitialized = true;
+    }
+    return this.groq;
   }
 
   async getAprendizado(usuarioId: string) {
@@ -172,7 +179,7 @@ export class AiService {
 
   async reconhecerVolume(imagemBase64: string): Promise<{ volume_ml: number; confianca: number }> {
     try {
-      const completion = await this.groq.chat.completions.create({
+      const completion = await this.getGroq().chat.completions.create({
         messages: [
           {
             role: 'user',
@@ -230,7 +237,7 @@ Se o usuário perguntar sobre quantidade de água, a recomendação geral é 35m
         ? `Contexto do usuário: peso ${contexto.peso}kg, idade ${contexto.idade}, cidade ${contexto.cidade}${contexto.temperatura ? `, temperatura ${contexto.temperatura}°C` : ''}.\n\n`
         : '';
 
-      const completion = await this.groq.chat.completions.create({
+      const completion = await this.getGroq().chat.completions.create({
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `${userContext}${mensagem}` },

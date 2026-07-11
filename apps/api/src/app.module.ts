@@ -17,10 +17,19 @@ import { PrismaModule } from './common/prisma.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     PrismaModule,
     AuthModule,
     UsersModule,
     HydrationModule,
+    GoalsModule,
+    NotificationsModule,
+    AiModule,
+    GamificationModule,
+    WeatherModule,
+    FamilyModule,
+    ReportsModule,
   ],
 })
 export class AppModule {}
