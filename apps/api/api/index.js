@@ -3,7 +3,7 @@ const serverless = require('serverless-http');
 const { NestFactory } = require('@nestjs/core');
 const { ExpressAdapter } = require('@nestjs/platform-express');
 const express = require('express');
-const { AppModule } = require('../dist/app.module');
+const { AppModule } = require('./dist/app.module');
 
 let cachedHandler;
 
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
     const handler = await bootstrap();
     return handler(req, res);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal error', message: err.message });
+    console.error('Hydra Error:', err);
+    res.status(500).json({ error: err.message, stack: err.stack });
   }
 };

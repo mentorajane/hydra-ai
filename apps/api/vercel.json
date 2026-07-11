@@ -1,16 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npx prisma generate && npx tsc --project tsconfig.json",
-  "outputDirectory": ".",
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**", "prisma/**", "node_modules/.prisma/**"]
-      }
+  "buildCommand": "npx prisma generate && npx tsc --project tsconfig.json",
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "dist/**",
+      "memory": 512,
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
