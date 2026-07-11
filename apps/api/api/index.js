@@ -9,20 +9,22 @@ let cachedHandler;
 
 async function bootstrap() {
   if (!cachedHandler) {
-    const expressApp = express();
-    const nestApp = await NestFactory.create(
-      AppModule,
-      new ExpressAdapter(expressApp),
-    );
-    nestApp.setGlobalPrefix('api/v1');
-    nestApp.enableCors({ origin: '*', methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' });
-    await nestApp.init();
-    cachedHandler = serverless(expressApp);
+    const app = express();
+    const nest = await NestFactory.create(AppModule, new ExpressAdapter(app));
+    nest.setGlobalPrefix('api/v1');
+    nest.enableCors();
+    await nest.init();
+    cachedHandler = serverless(app);
   }
   return cachedHandler;
 }
 
-module.exports = async function handler(req, res) {
-  const app = await bootstrap();
-  return app(req, res);
+module.exports = async (req, res) => {
+  try {
+    const handler = await bootstrap();
+    return handler(req, res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal error', message: err.message });
+  }
 };
