@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { prisma } from '@hydra/database';
+import { prisma } from './prisma';
 
 @Global()
 @Module({

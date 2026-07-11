@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AiService } from './ai.service';
-import { prisma } from '@hydra/database';
+import { prisma } from '../common/prisma';
 
 @Controller('ai')
 export class AiController {

@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Sexo {
+  MASCULINO
+  FEMININO
+}
+
+enum NivelAtividade {
+  SEDENTARIO
+  LEVE
+  MODERADO
+  INTENSO
+  MUITO_INTENSO
+}
+
+enum StatusNotificacao {
+  PENDENTE
+  ENVIADA
+  CONFIRMADA
+  IGNORADA
+}
+
+enum TipoNotificacao {
+  LEMBRETE
+  ALERTA_PRIORIDADE
+  META_ATUALIZADA
+  CONQUISTA
+  RECORDATORIO
+}
+
+enum TipoConquista {
+  DIAS_7
+  DIAS_30
+  LITROS_100
+  PRIMEIRO_MES
+  MISSAO_COMPLETA
+}
+
+model Usuario {
+  id                     String            @id @default(cuid())
+  nome                   String
+  email                  String            @unique
+  senha_hash             String
+  idade                  Int
+  sexo                   Sexo
+  peso                   Float
+  altura                 Float
+  cidade                 String
+  estado                 String?
+  latitude               Float?
+  longitude              Float?
+  atividade_fisica       NivelAtividade    @default(SEDENTARIO)
+  gestante               Boolean           @default(false)
+  amamentando            Boolean           @default(false)
+  doenca_renal           Boolean           @default(false)
+  diabetes               Boolean           @default(false)
+  hipertensao            Boolean           @default(false)
+  medicamentos_diureticos Boolean          @default(false)
+  trabalho_sentado        Boolean          @default(false)
+  horario_acorda         String            @default("07:00")
+  horario_dorme          String            @default("22:00")
+  allow_notifications    Boolean           @default(true)
+  premium                Boolean           @default(false)
+  modo_idoso             Boolean           @default(false)
+  avatar                 String?
+  created_at             DateTime          @default(now())
+  updated_at             DateTime          @updatedAt
+
+  hidratacoes            RegistroHidratacao[]
+  metas                   MetaHidratacao[]
+  notificacoes           Notificacao[]
+  aprendizado            AprendizadoIA?
+  conquistas             ConquistaUsuario[]
+  humor_registros        RegistroHumor[]
+  familia_pais           RelacaoFamiliar[]  @relation("PaiFilho")
+  familia_filhos         RelacaoFamiliar[]  @relation("FilhoPai")
+  preferencias           PreferenciaUsuario?
+  gamificacao            Gamificacao?
+
+  @@map("usuarios")
+}
+
+model RegistroHidratacao {
+  id           String   @id @default(cuid())
+  usuario_id   String
+  quantidade_ml Float
+  data_hora    DateTime @default(now())
+  origem       String   @default("manual") // manual, smartwatch, camera, integracao
+
+  usuario      Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([usuario_id, data_hora])
+  @@map("registros_hidratacao")
+}
+
+model MetaHidratacao {
+  id                 String   @id @default(cuid())
+  usuario_id         String
+  meta_ml            Float
+  meta_ml_por_kg     Float
+  quantidade_por_gole_ml Float @default(200)
+  numero_lembretes   Int
+  intervalos_minutos Int
+  ajuste_clima_ml    Float    @default(0)
+  ajuste_atividade_ml Float   @default(0)
+  ajuste_gestacao_ml Float    @default(0)
+  ajuste_amamentacao_ml Float @default(0)
+  ajuste_doenca_ml   Float    @default(0)
+  temperatura_atual  Float?
+  ativa              Boolean  @default(true)
+  calculada_em       DateTime @default(now())
+
+  usuario            Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([usuario_id, ativa])
+  @@map("metas_hidratacao")
+}
+
+model Notificacao {
+  id               String             @id @default(cuid())
+  usuario_id       String
+  tipo             TipoNotificacao
+  mensagem         String
+  horario_agendado String             // HH:mm
+  status           StatusNotificacao  @default(PENDENTE)
+  data_agendada    DateTime?
+  enviada_em       DateTime?
+  confirmada_em    DateTime?
+  criada_em        DateTime           @default(now())
+
+  usuario          Usuario            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([usuario_id, status, horario_agendado])
+  @@map("notificacoes")
+}
+
+model AprendizadoIA {
+  id                   String   @id @default(cuid())
+  usuario_id           String   @unique
+  horarios_preferidos  String[] // ["07:30", "09:00", ...]
+  frequencia_ideal_minutos Int   @default(90)
+  taxa_resposta        Float    @default(0.0)
+  horarios_ignorados   String[] // horarios que o usuario ignora
+  manha_ml             Float    @default(0)
+  tarde_ml             Float    @default(0)
+  noite_ml             Float    @default(0)
+  horario_pico         String?
+  horario_menor        String?
+  ultima_atualizacao   DateTime @default(now())
+
+  usuario              Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("aprendizado_ia")
+}
+
+model Conquista {
+  id          String        @id @default(cuid())
+  tipo        TipoConquista @unique
+  nome        String
+  descricao   String
+  icone       String
+  created_at  DateTime      @default(now())
+
+  usuarios    ConquistaUsuario[]
+
+  @@map("conquistas")
+}
+
+model ConquistaUsuario {
+  id           String   @id @default(cuid())
+  usuario_id   String
+  conquista_id String
+  conquistada_em DateTime @default(now())
+
+  usuario      Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  conquista    Conquista @relation(fields: [conquista_id], references: [id], onDelete: Cascade)
+
+  @@unique([usuario_id, conquista_id])
+  @@map("conquistas_usuarios")
+}
+
+model RegistroHumor {
+  id         String   @id @default(cuid())
+  usuario_id String
+  humor      Int      // 1-5
+  horas_sono Float?
+  observacao String?
+  data       DateTime @default(now())
+
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([usuario_id, data])
+  @@map("registros_humor")
+}
+
+model RelacaoFamiliar {
+  id          String   @id @default(cuid())
+  responsavel_id String
+  dependente_id  String
+  tipo        String   // "PAI_FILHO", "FILHO_IDOSO", "CUIDADOR"
+  created_at  DateTime @default(now())
+
+  responsavel Usuario  @relation("PaiFilho", fields: [responsavel_id], references: [id], onDelete: Cascade)
+  dependente  Usuario  @relation("FilhoPai", fields: [dependente_id], references: [id], onDelete: Cascade)
+
+  @@unique([responsavel_id, dependente_id])
+  @@map("relacoes_familiares")
+}
+
+model PreferenciaUsuario {
+  id               String   @id @default(cuid())
+  usuario_id       String   @unique
+  dark_mode        Boolean  @default(false)
+  som_ativado      Boolean  @default(true)
+  vibracao_ativada Boolean  @default(true)
+  som_notificacao  String?
+  idioma           String   @default("pt-BR")
+  volume_gole_ml   Float    @default(200)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  usuario          Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("preferencias_usuario")
+}
+
+model Gamificacao {
+  id           String   @id @default(cuid())
+  usuario_id   String   @unique
+  xp           Int      @default(0)
+  nivel        Int      @default(1)
+  planta_atual String?
+  aquario_atual String?
+  cidade_verde Float    @default(0) // 0-100
+  arvore_nivel Int      @default(1)
+  avatar_energia Int    @default(100)
+  updated_at   DateTime @updatedAt
+
+  usuario      Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@map("gamificacao")
+}

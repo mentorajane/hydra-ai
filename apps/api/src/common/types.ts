@@ -1,0 +1,47 @@
+export enum Sexo {
+  MASCULINO = 'MASCULINO',
+  FEMININO = 'FEMININO',
+}
+
+export enum NivelAtividade {
+  SEDENTARIO = 'SEDENTARIO',
+  LEVE = 'LEVE',
+  MODERADO = 'MODERADO',
+  INTENSO = 'INTENSO',
+  MUITO_INTENSO = 'MUITO_INTENSO',
+}
+
+export enum TipoNotificacao {
+  LEMBRETE = 'LEMBRETE',
+  ALERTA_PRIORIDADE = 'ALERTA_PRIORIDADE',
+  META_ATUALIZADA = 'META_ATUALIZADA',
+  CONQUISTA = 'CONQUISTA',
+}
+
+export enum StatusNotificacao {
+  PENDENTE = 'PENDENTE',
+  ENVIADA = 'ENVIADA',
+  CONFIRMADA = 'CONFIRMADA',
+  IGNORADA = 'IGNORADA',
+}
+
+export const RECOMENDACOES_BASE = {
+  HOMEM_ADULTO_ML: 3700,
+  MULHER_ADULTA_ML: 2700,
+  POR_KG_BASE: 35,
+  FATOR_IDADE_60_MAIS: 0.9,
+  FATOR_IDADE_70_MAIS: 0.85,
+  GESTANTE_ADICIONAL_ML: 300,
+  AMAMENTACAO_ADICIONAL_ML: 700,
+  DIABETES_ADICIONAL_ML: 500,
+  DOENCA_RENAL: null,
+  DIURETICO_ADICIONAL_ML: 300,
+} as const;
+
+export const POR_KG_ATIVIDADE: Record<NivelAtividade, number> = {
+  [NivelAtividade.SEDENTARIO]: 35,
+  [NivelAtividade.LEVE]: 40,
+  [NivelAtividade.MODERADO]: 45,
+  [NivelAtividade.INTENSO]: 50,
+  [NivelAtividade.MUITO_INTENSO]: 55,
+};

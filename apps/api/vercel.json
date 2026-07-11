@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "buildCommand": "npm install && npx prisma generate && npx tsc --project tsconfig.json",
+  "outputDirectory": ".",
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**", "prisma/**", "node_modules/.prisma/**"]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.js"
+    }
+  ]
+}

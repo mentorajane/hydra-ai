@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { prisma } from '@hydra/database';
+import { prisma } from '../common/prisma';
 import Groq from 'groq-sdk';
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { prisma } from '@hydra/database';
+import { prisma } from '../common/prisma';
 import { Cron } from '@nestjs/schedule';
 
 @Injectable()

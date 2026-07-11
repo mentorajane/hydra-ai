@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { prisma } from '@hydra/database';
+import { prisma } from '../common/prisma';
 
 @Injectable()
 export class FamilyService {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { prisma } from '@hydra/database';
-import { NivelAtividade, RECOMENDACOES_BASE, POR_KG_ATIVIDADE } from '@hydra/shared';
+import { prisma } from '../common/prisma';
+import { NivelAtividade, RECOMENDACOES_BASE, POR_KG_ATIVIDADE } from '../common/types';
 
 @Injectable()
 export class GoalsService {

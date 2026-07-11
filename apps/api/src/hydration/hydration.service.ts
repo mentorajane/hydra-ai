@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
-import { prisma } from '@hydra/database';
+import { prisma } from '../common/prisma';
 import { AiService } from '../ai/ai.service';
 
 @Injectable()
