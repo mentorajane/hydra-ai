@@ -170,6 +170,40 @@ export class AiService {
     return horarios.sort();
   }
 
+  async reconhecerVolume(imagemBase64: string): Promise<{ volume_ml: number; confianca: number }> {
+    try {
+      const completion = await this.groq.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: 'Estime o volume de água neste copo ou garrafa em ml. Responda APENAS com um número inteiro entre 0 e 2000. Não escreva nada além do número.',
+              },
+              {
+                type: 'image_url',
+                image_url: { url: `data:image/jpeg;base64,${imagemBase64}` },
+              },
+            ],
+          },
+        ],
+        model: 'llama-3.2-11b-vision-preview',
+        temperature: 0.1,
+        max_tokens: 10,
+      });
+
+      const texto = completion.choices[0]?.message?.content?.trim() || '0';
+      const volume = parseInt(texto.replace(/[^0-9]/g, ''), 10);
+      const volumeValido = isNaN(volume) || volume < 0 ? 0 : Math.min(volume, 2000);
+
+      return { volume_ml: volumeValido, confianca: volumeValido > 0 ? 0.8 : 0 };
+    } catch (error: any) {
+      console.error('Erro ao reconhecer volume:', error.message);
+      return { volume_ml: 200, confianca: 0.3 };
+    }
+  }
+
   async conversar(mensagem: string, contexto?: { peso?: number; idade?: number; cidade?: string; temperatura?: number }) {
     try {
       const systemPrompt = `Você é o Hydra AI, um assistente especializado em hidratação e saúde.

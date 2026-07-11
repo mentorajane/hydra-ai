@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { prisma } from '@hydra/database';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class HydrationService {
+  constructor(
+    @Inject(forwardRef(() => AiService))
+    private aiService: AiService,
+  ) {}
+
   async registrar(usuarioId: string, quantidade_ml: number, origem = 'manual') {
     const registro = await prisma.registroHidratacao.create({
       data: { usuario_id: usuarioId, quantidade_ml, origem },
@@ -65,9 +71,23 @@ export class HydrationService {
   }
 
   async registrarCamera(usuarioId: string, imagemBase64: string) {
-    // IA para reconhecer volume de água no copo/garrafa
-    // Placeholder: retorna 200ml como fallback
-    const quantidadeEstimada = 200;
-    return this.registrar(usuarioId, quantidadeEstimada, 'camera');
+    const { volume_ml, confianca } = await this.aiService.reconhecerVolume(imagemBase64);
+
+    const registro = await prisma.registroHidratacao.create({
+      data: {
+        usuario_id: usuarioId,
+        quantidade_ml: volume_ml,
+        origem: 'camera',
+      },
+    });
+
+    return {
+      registro,
+      volume_ml,
+      confianca,
+      aviso: confianca < 0.5
+        ? 'Não foi possível reconhecer o volume com precisão. O valor pode estar incorreto.'
+        : undefined,
+    };
   }
 }
