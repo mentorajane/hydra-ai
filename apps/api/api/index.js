@@ -1,16 +1,34 @@
+require('reflect-metadata');
+const serverless = require('serverless-http');
+const { NestFactory } = require('@nestjs/core');
+const { ExpressAdapter } = require('@nestjs/platform-express');
+const express = require('express');
+const { AppModule } = require('../dist/app.module');
+
+let cachedHandler;
+
+async function bootstrap() {
+  if (!cachedHandler) {
+    const app = express();
+    const nest = await NestFactory.create(AppModule, new ExpressAdapter(app));
+    nest.setGlobalPrefix('api/v1');
+    nest.enableCors();
+    await nest.init();
+    cachedHandler = serverless(app);
+  }
+  return cachedHandler;
+}
+
 module.exports = async (req, res) => {
   try {
-    const steps = [];
-    try { require('reflect-metadata'); steps.push('reflect-metadata') } catch(e) { steps.push('reflect FAIL:'+e.message) }
-    try { require('express'); steps.push('express') } catch(e) { steps.push('express FAIL:'+e.message) }
-    try { require('serverless-http'); steps.push('serverless-http') } catch(e) { steps.push('serverless FAIL:'+e.message) }
-    try { require('@nestjs/core'); steps.push('@nestjs/core') } catch(e) { steps.push('@nestjs/core FAIL:'+e.message) }
-    try { require('@nestjs/platform-express'); steps.push('@nestjs/platform-express') } catch(e) { steps.push('@nestjs/platform-express FAIL:'+e.message) }
-    try { require('../dist/app.module'); steps.push('app.module') } catch(e) { steps.push('app.module FAIL:'+e.message) }
-    
-    res.status(200).json({ steps, dirs: require('fs').readdirSync('.').filter(d => !d.startsWith('.')) });
+    const handler = await bootstrap();
+    return handler(req, res);
   } catch (err) {
     res.setHeader('Content-Type', 'application/json');
-    res.status(500).end(JSON.stringify({ error: err.message, stack: (err.stack||'').split('\n').slice(0,10).join('\n') }));
+    res.status(500);
+    res.end(JSON.stringify({
+      error: err.message,
+      stack: (err.stack || '').split('\n').slice(0, 30).join('\n')
+    }));
   }
 };
