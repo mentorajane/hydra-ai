@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npx next build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "ignoreCommand": "npx turbo-ignore",
+  "git": {
+    "deploymentEnabled": {
+      "apps/api": false,
+      "apps/mobile": false,
+      "packages": false
+    }
+  }
+}
