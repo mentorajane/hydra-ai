@@ -17,11 +17,21 @@ module.exports = async (req, res) => {
       app = nestApp;
     }
 
-    app(req, res);
+    await new Promise((resolve, reject) => {
+      res.on('finish', resolve);
+      res.on('error', reject);
+      try {
+        app(req, res);
+      } catch (e) {
+        reject(e);
+      }
+    });
   } catch (err) {
     try {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: err.message, stack: (err.stack||'').split('\n').slice(0,20).join('\n') }));
-    } catch(e) { console.error(e); }
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message, stack: (err.stack||'').split('\n').slice(0,20).join('\n') }));
+      }
+    } catch(e) { /* ignore */ }
   }
 };
