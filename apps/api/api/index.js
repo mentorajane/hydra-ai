@@ -4,9 +4,8 @@ module.exports = async (req, res) => {
     const cwd = process.cwd();
     const dirs = fs.readdirSync(cwd).filter(d => !d.startsWith('.'));
     const distExists = fs.existsSync('dist');
-    const distApiExists = fs.existsSync('api/dist');
+    const distFiles = distExists ? fs.readdirSync('dist').filter(d => !d.startsWith('.')) : [];
 
-    // Try to find api-handler
     const searchPaths = [
       '../dist/api-handler',
       './dist/api-handler',
@@ -19,15 +18,12 @@ module.exports = async (req, res) => {
     res.status(200).json({
       cwd,
       dirs,
-      files: dirs.filter(d => fs.statSync(d).isFile()).map(f => ({ name: f, size: fs.statSync(f).size })),
-      subdirs: dirs.filter(d => fs.statSync(d).isDirectory()),
       distExists,
-      distApiExists,
+      distFiles,
       foundPaths: found,
-      pwd: process.cwd(),
       lambdaRoot: process.env.LAMBDA_TASK_ROOT || 'none'
     });
   } catch (err) {
-    res.status(500).json({ error: err.message, stack: (err.stack || '').split('\n').slice(0,5).join('\n') });
+    res.status(500).json({ error: err.message, stack: (err.stack || '').split('\n').slice(0,8).join('\n') });
   }
 };
