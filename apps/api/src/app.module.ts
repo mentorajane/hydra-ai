@@ -25,11 +25,6 @@ import { PrismaModule } from './common/prisma.module';
     HydrationModule,
     GoalsModule,
     NotificationsModule,
-    AiModule,
-    GamificationModule,
-    WeatherModule,
-    FamilyModule,
-    ReportsModule,
   ],
 })
 export class AppModule {}
