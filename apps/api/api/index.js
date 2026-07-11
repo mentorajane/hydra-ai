@@ -1,3 +1,3 @@
-require('reflect-metadata');
-const handler = require('./dist/api-handler').default;
-module.exports = handler;
+module.exports = async (req, res) => {
+  res.status(200).json({ status: 'ok', method: req.method, path: req.url });
+};
