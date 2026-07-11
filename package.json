@@ -1,0 +1,29 @@
+{
+  "name": "hydra-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hydra AI - Assistente Inteligente de Hidratação",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:mobile": "npm run dev -w apps/mobile",
+    "build:api": "npm run build -w apps/api",
+    "build:web": "npm run build -w apps/web",
+    "build:shared": "npm run build -w packages/shared",
+    "build:database": "npm run build -w packages/database",
+    "db:generate": "npm run db:generate -w packages/database",
+    "db:push": "npm run db:push -w packages/database",
+    "db:migrate": "npm run db:migrate -w packages/database",
+    "db:studio": "npm run db:studio -w packages/database",
+    "lint": "npm run lint -w apps/api && npm run lint -w apps/web",
+    "typecheck": "npm run typecheck -w apps/api && npm run typecheck -w apps/web"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "allowScripts": {}
+}
