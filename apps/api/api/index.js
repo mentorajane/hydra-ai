@@ -1,14 +1,14 @@
-require('reflect-metadata');
-const serverless = require('serverless-http');
-const { NestFactory } = require('@nestjs/core');
-const { ExpressAdapter } = require('@nestjs/platform-express');
-const express = require('express');
-const { AppModule } = require('../dist/app.module');
-
 let cachedHandler;
 
 async function bootstrap() {
   if (!cachedHandler) {
+    require('reflect-metadata');
+    const serverless = require('serverless-http');
+    const { NestFactory } = require('@nestjs/core');
+    const { ExpressAdapter } = require('@nestjs/platform-express');
+    const express = require('express');
+    const { AppModule } = require('../dist/app.module');
+
     const app = express();
     const nest = await NestFactory.create(AppModule, new ExpressAdapter(app));
     nest.setGlobalPrefix('api/v1');
