@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npx prisma generate && npx tsc --project tsconfig.json",
+  "buildCommand": "npm run vercel-build",
   "functions": {
     "api/index.js": {
       "includeFiles": "dist/**",
