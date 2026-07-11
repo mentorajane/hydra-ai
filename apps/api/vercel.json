@@ -3,15 +3,10 @@
   "buildCommand": "npm run vercel-build",
   "functions": {
     "api/index.js": {
-      "includeFiles": "dist/**",
-      "memory": 512,
-      "maxDuration": 30
+      "includeFiles": "dist/**"
     }
   },
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/index.js"
-    }
+    { "src": "/(.*)", "dest": "api/index.js" }
   ]
 }
